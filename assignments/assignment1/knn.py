@@ -91,7 +91,7 @@ class KNN:
         '''
         X_tests_ext = X[:, np.newaxis, :]
         X_train_ext = self.train_X[np.newaxis, :, :]
-        dists = np.sum(np.abs(X_tests_ext-X_train_ext), axis=2)
+        dists = np.sum(np.abs(X_tests_ext - X_train_ext), axis=2)
         return dists
 
     def predict_labels_binary(self, dists):
@@ -106,12 +106,28 @@ class KNN:
         pred, np array of bool (num_test_samples) - binary predictions 
            for every test sample
         '''
+        from collections import Counter
+
         num_test = dists.shape[0]
         pred = np.zeros(num_test, np.bool)
+        arg_dist = np.argsort(dists)
         for i in range(num_test):
             # TODO: Implement choosing best class based on k
             # nearest training samples
-            pass
+
+            nearests = list(self.train_y[j] for j in arg_dist[i, 0:self.k])
+            # print(nearests)
+            # print(Counter(nearests).most_common())
+
+            # print(Counter(nearests).most_common(1)[0][0])
+            pred[i] = Counter(nearests).most_common(1)[0][0]
+
+            # (values, counts) = np.unique(nearests, return_counts=True)
+            # print(values[0])
+            # ind = np.argmax(counts)
+            # pred[i] = values[ind] == 9
+            # print(values[ind])
+        # print(Counter(pred))
         return pred
 
     def predict_labels_multiclass(self, dists):
@@ -127,10 +143,17 @@ class KNN:
            for every test sample
         '''
         num_test = dists.shape[0]
-        num_test = dists.shape[0]
         pred = np.zeros(num_test, np.int)
+        arg_dist = np.argsort(dists)
         for i in range(num_test):
             # TODO: Implement choosing best class based on k
             # nearest training samples
-            pass
+            # for j in arg_dist[i, :]:
+            #     nearests[j] =self.train_y[j]
+            nearests = (self.train_y[j] for j in arg_dist[i, :])
+            # from collections import Counter
+            # pred[i] = Counter(nearests).most_common(1)[0][0]
+            (values, counts) = np.unique(nearests, return_counts=True)
+            ind = np.argmax(counts)
+            pred[i] = values[ind]
         return pred
