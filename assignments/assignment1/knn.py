@@ -150,10 +150,11 @@ class KNN:
             # nearest training samples
             # for j in arg_dist[i, :]:
             #     nearests[j] =self.train_y[j]
-            nearests = (self.train_y[j] for j in arg_dist[i, :])
-            # from collections import Counter
-            # pred[i] = Counter(nearests).most_common(1)[0][0]
-            (values, counts) = np.unique(nearests, return_counts=True)
-            ind = np.argmax(counts)
-            pred[i] = values[ind]
+            nearests = (self.train_y[j] for j in arg_dist[i, 0:self.k])
+            from collections import Counter
+            # print(f'{Counter(nearests).most_common(1)[0][0]}')
+            pred[i] = Counter(nearests).most_common(1)[0][0]
+            # (values, counts) = np.unique(nearests, return_counts=True)
+            # ind = np.argmax(counts)
+            # pred[i] = values[ind]
         return pred
