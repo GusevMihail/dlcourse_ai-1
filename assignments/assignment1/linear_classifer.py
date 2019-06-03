@@ -41,7 +41,6 @@ def cross_entropy_loss(probs, target_index):
         batch_size = target_index.shape[0]
         return -np.log(probs[np.arange(batch_size), target_index])
 
-
     # Your final implementation shouldn't have any loops
     raise Exception("Not implemented!")
 
@@ -61,8 +60,13 @@ def softmax_with_cross_entropy(predictions, target_index):
       loss, single value - cross-entropy loss
       dprediction, np array same shape as predictions - gradient of predictions by loss value
     '''
-    # TODO implement softmax with cross-entropy
-    # Your final implementation shouldn't have any loops
+
+    probs = softmax(predictions)
+    loss = cross_entropy_loss(probs, target_index)
+    dprediction = probs
+    if len(predictions.shape) == 1:
+        dprediction[target_index] -= 1
+
     raise Exception("Not implemented!")
 
     return loss, dprediction
@@ -86,7 +90,7 @@ def l2_regularization(W, reg_strength):
     raise Exception("Not implemented!")
 
     return loss, grad
-    
+
 
 def linear_softmax(X, W, target_index):
     '''
@@ -107,7 +111,7 @@ def linear_softmax(X, W, target_index):
     # TODO implement prediction and gradient over W
     # Your final implementation shouldn't have any loops
     raise Exception("Not implemented!")
-    
+
     return loss, dW
 
 
@@ -131,7 +135,7 @@ class LinearSoftmaxClassifier():
 
         num_train = X.shape[0]
         num_features = X.shape[1]
-        num_classes = np.max(y)+1
+        num_classes = np.max(y) + 1
         if self.W is None:
             self.W = 0.001 * np.random.randn(num_features, num_classes)
 
@@ -171,12 +175,3 @@ class LinearSoftmaxClassifier():
         raise Exception("Not implemented!")
 
         return y_pred
-
-
-
-                
-                                                          
-
-            
-
-                
