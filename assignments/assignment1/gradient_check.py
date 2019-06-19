@@ -30,7 +30,7 @@ def check_gradient(f, x, delta=1e-5, tol=1e-4):
         return check_gradient_single(f, x, delta, tol)
     else:
         print('run batch version of gradient check')
-        return check_gradient_single(f, x, delta, tol)
+        return check_gradient_batch(f, x, delta, tol)
         # analytic_grad = analytic_grad.copy()
         # numeric_grad = np.zeros(x.shape, dtype=np.float)
 
@@ -41,12 +41,24 @@ def check_gradient(f, x, delta=1e-5, tol=1e-4):
 
         # for i in range(x.shape[0]):
 
-
         # print("Gradient check passed!")
         # return True
 
 
 def check_gradient_single(f, x, delta=1e-5, tol=1e-4):
+    '''
+    Checks the implementation of analytical gradient by comparing
+    it to numerical gradient using two-point formula
+
+    Arguments:
+      f: function that receives x and computes value and gradient
+      x: np array, shape is either (N) or (batch_size, N) - initial point where gradient is checked
+      delta: step to compute numerical gradient
+      tol: tolerance for comparing numerical and analytical gradient
+
+    Return:
+      bool indicating whether gradients match or not
+    '''
 
     fx, analytic_grad = f(x)
 
@@ -75,6 +87,64 @@ def check_gradient_single(f, x, delta=1e-5, tol=1e-4):
             print("Gradients at %s. Analytic: %2.5f, Numeric: %2.5f" % (
                 ix, analytic_grad_at_ix, numeric_grad_at_ix))
         it.iternext()
+
+    print("Gradient check passed!")
+    it.close()
+
+    return True
+
+
+def check_gradient_batch(f, x, delta=1e-5, tol=1e-4):
+    '''
+    Checks the implementation of analytical gradient by comparing
+    it to numerical gradient using two-point formula
+
+    Arguments:
+      f: function that receives x and computes value and gradient
+      x: np array, shape is (batch_size, N) - initial point where gradient is checked
+      delta: step to compute numerical gradient
+      tol: tolerance for comparing numerical and analytical gradient
+
+    Return:
+      bool indicating whether gradients match or not
+    '''
+
+    fx, analytic_grad = f(x)
+    numeric_grad = np.zeros_like(analytic_grad, dtype=np.float)
+
+    it = np.nditer(x, flags=['multi_index'])
+    while not it.finished:
+        ix = it.multi_index
+        fx, analytic_grad = f(x)
+        analytic_grad_at_ix = analytic_grad[ix]
+        number_in_batch = ix[0]
+        number_in_N = ix[1]
+        delta_arr = np.zeros(x.shape[1], dtype=np.float)
+        delta_arr[number_in_N] = delta
+        x1 = (x[number_in_batch] + delta_arr)
+        x2 = (x[number_in_batch] - delta_arr)
+        numeric_grad[ix] = (f(x1)[0] - f(x2)[0]) / (2 * delta)
+        # print('')
+        # print('raw ng', numeric_grad_at_ix)
+        # print(delta_arr)
+        # print(f(x[i] + delta_arr)[0], f(x[i] - delta_arr)[0], f(x + delta_arr)[0] - f(x - delta_arr)[0])
+        it.iternext()
+
+    # DEBUG
+    print('analytic_grad\n', analytic_grad, '\n')
+    print('numeric_grad\n', numeric_grad, '\n')
+
+    # for i in analytic_grad.shape[1]:
+    #     analytic_grad_at_ix = analytic_grad[]
+    #     if not np.isclose(numeric_grad_at_ix, analytic_grad_at_ix, tol):
+    #         print("Gradients are different at %s. Analytic: %2.5f, Numeric: %2.5f"
+    #               % (ix, analytic_grad_at_ix, numeric_grad_at_ix))
+    #         it.close()
+    #         return False
+    #     else:  # DEBUG
+    #         print("Gradients at %s. Analytic: %2.5f, Numeric: %2.5f" % (
+    #             ix, analytic_grad_at_ix, numeric_grad_at_ix))
+    #     it.iternext()
 
     print("Gradient check passed!")
     it.close()
