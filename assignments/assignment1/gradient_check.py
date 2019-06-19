@@ -24,80 +24,57 @@ def check_gradient(f, x, delta=1e-5, tol=1e-4):
     assert np.all(np.isclose(orig_x, x, tol)), "Functions shouldn't modify input variables"
 
     assert analytic_grad.shape == x.shape
-    analytic_grad = analytic_grad.copy()
-    numeric_grad = np.zeros(x.shape, dtype=np.float)
 
-    # We will go through every dimension of x and compute numeric
-    # derivative for it
-    # if len(x.shape) == 1:  # input is single sample
-    #     x = x[np.newaxis, :]
+    if len(x.shape) == 1:  # input is single sample
+        print('run single-point version of gradient check')
+        return check_gradient_single(f, x, delta, tol)
+    else:
+        print('run batch version of gradient check')
+        return check_gradient_single(f, x, delta, tol)
+        # analytic_grad = analytic_grad.copy()
+        # numeric_grad = np.zeros(x.shape, dtype=np.float)
 
-    print(f'X {x.shape}\n{x}')
-    print('\n')
+        # We will go through every dimension of x and compute numeric
+        # derivative for it
+        # if len(x.shape) == 1:  # input is single sample
+        #     x = x[np.newaxis, :]
 
-    print(f'analytic_grad\n{analytic_grad}')
-    for i in range(x.shape[0]):
-        it = np.nditer(x[i], flags=['multi_index'])
-        while not it.finished:
-            ix = it.multi_index
-            fx, analytic_grad = f(x[i])
-            analytic_grad_at_ix = analytic_grad[ix]
-            delta_arr = np.zeros(x[i].shape, dtype=np.float)
-            delta_arr[ix] = delta
-            x1 = (x[i] + delta_arr)
-            x2 = (x[i] - delta_arr)
-            numeric_grad_at_ix = (f(x1)[0] - f(x2)[0]) / (2 * delta)
-            # print('')
-            # print('raw ng', numeric_grad_at_ix)
-            # print(delta_arr)
-            # # print(f(x[i] + delta_arr)[0], f(x[i] - delta_arr)[0], f(x + delta_arr)[0] - f(x - delta_arr)[0])
-            numeric_grad_at_ix = np.average(numeric_grad_at_ix)
-            print('ng', numeric_grad_at_ix)
-            # print('ag', analytic_grad_at_ix)
-            # if not np.isclose(numeric_grad_at_ix, analytic_grad_at_ix, tol):
-            #     print("Gradients are different at %s. Analytic: %2.5f, Numeric: %2.5f" % (
-            #         ix, analytic_grad_at_ix, numeric_grad_at_ix))
-            #     # it.close()
-            #     # return False
-            # else:  # DEBUG
-            #     print("Gradients at %s. Analytic: %2.5f, Numeric: %2.5f" % (
-            #         ix, analytic_grad_at_ix, numeric_grad_at_ix))
-            it.iternext()
+        # for i in range(x.shape[0]):
 
-    # print('numeric_grad\n', numeric_grad)
 
-    # for i in range(x.shape[0]):
-    #     it = np.nditer(x[i], flags=['multi_index'], op_flags=['readwrite'])
-    #     print(f'iter:{i}, row:{x[i]}\n')
-    #     while not it.finished:
-    #         ix = it.multi_index
-    #         fx, analytic_grad = f(x[i])
-    #         analytic_grad_at_ix = analytic_grad[ix]
-    #         delta_arr = np.zeros(x[i].shape, dtype=np.float)
-    #         delta_arr[ix] = delta
-    #         x1 = (x[i] + delta_arr)
-    #         x2 = (x[i] - delta_arr)
-    #         numeric_grad_at_ix = (f(x1)[0] - f(x2)[0]) / (2 * delta)
-    #         # print('')
-    #         # print('raw ng', numeric_grad_at_ix)
-    #         # print(delta_arr)
-    #         # # print(f(x[i] + delta_arr)[0], f(x[i] - delta_arr)[0], f(x + delta_arr)[0] - f(x - delta_arr)[0])
-    #         numeric_grad_at_ix = np.average(numeric_grad_at_ix)
-    #         # print('ng', numeric_grad_at_ix)
-    #         # print('ag', analytic_grad_at_ix)
-    #         if not np.isclose(numeric_grad_at_ix, analytic_grad_at_ix, tol):
-    #             print("Gradients are different at %s. Analytic: %2.5f, Numeric: %2.5f" % (
-    #                 ix, analytic_grad_at_ix, numeric_grad_at_ix))
-    #             # it.close()
-    #             # return False
-    #         else:  # DEBUG
-    #             print("Gradients at %s. Analytic: %2.5f, Numeric: %2.5f" % (
-    #                 ix, analytic_grad_at_ix, numeric_grad_at_ix))
-    #         it.iternext()
+        # print("Gradient check passed!")
+        # return True
 
-    # else:  # input is batch of samples
-    #     it = np.nditer(x, flags=['multi_index'], op_flags=['read'])
-    #     for ix in it.multi_index:
+
+def check_gradient_single(f, x, delta=1e-5, tol=1e-4):
+
+    fx, analytic_grad = f(x)
+
+    it = np.nditer(x, flags=['multi_index'])
+    while not it.finished:
+        ix = it.multi_index
+        fx, analytic_grad = f(x)
+        analytic_grad_at_ix = analytic_grad[ix]
+        delta_arr = np.zeros(x.shape, dtype=np.float)
+        delta_arr[ix] = delta
+        x1 = (x + delta_arr)
+        x2 = (x - delta_arr)
+        numeric_grad_at_ix = (f(x1)[0] - f(x2)[0]) / (2 * delta)
+        # print('')
+        # print('raw ng', numeric_grad_at_ix)
+        # print(delta_arr)
+        # print(f(x[i] + delta_arr)[0], f(x[i] - delta_arr)[0], f(x + delta_arr)[0] - f(x - delta_arr)[0])
+        # print('ng', numeric_grad_at_ix)
+        # print('ag', analytic_grad_at_ix)
+        if not np.isclose(numeric_grad_at_ix, analytic_grad_at_ix, tol):
+            print("Gradients are different at %s. Analytic: %2.5f, Numeric: %2.5f"
+                  % (ix, analytic_grad_at_ix, numeric_grad_at_ix))
+            it.close()
+            return False
+        else:  # DEBUG
+            print("Gradients at %s. Analytic: %2.5f, Numeric: %2.5f" % (
+                ix, analytic_grad_at_ix, numeric_grad_at_ix))
+        it.iternext()
 
     print("Gradient check passed!")
     it.close()

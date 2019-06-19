@@ -46,7 +46,7 @@ class TestLinearClassifer(TestCase):
         self.assertEqual(sum / batch_size, output)
         self.assertIsInstance(output, float)
 
-    def test_softmax_with_cross_entropy(self):
+    def test_softmax_with_cross_entropy_single(self):
         f = softmax_with_cross_entropy
         num_classes = 4
         for i in range(10):
@@ -54,4 +54,13 @@ class TestLinearClassifer(TestCase):
             input_data = np.random.randint(-100, 100, (num_classes,)).astype(np.float)
             target_index = np.random.randint(0, num_classes-1)
             self.assertTrue(check_gradient(lambda x: f(x, target_index), input_data))
+
+    def test_softmax_with_cross_entropy_batch(self):
+        f = softmax_with_cross_entropy
+        num_classes = 4
         batch_size = 5
+        for i in range(10):
+            np.random.seed(i)
+            input_data = np.random.randint(-100, 100, (num_classes,)).astype(np.float)
+            target_index = np.random.randint(0, num_classes-1)
+            self.assertTrue(check_gradient(lambda x: f(x, target_index), input_data))
