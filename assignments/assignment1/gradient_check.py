@@ -112,6 +112,8 @@ def check_gradient_batch(f, x, delta=1e-5, tol=1e-4):
     fx, analytic_grad = f(x)
     numeric_grad = np.zeros_like(analytic_grad, dtype=np.float)
 
+    # TODO переделать итератор так, чтобы заполнять все дельты разом и передавать в функцию X1 и X2
+    #  сразу батчем со всем нужными изменениями
     it = np.nditer(x, flags=['multi_index'])
     while not it.finished:
         ix = it.multi_index
@@ -119,22 +121,40 @@ def check_gradient_batch(f, x, delta=1e-5, tol=1e-4):
         analytic_grad_at_ix = analytic_grad[ix]
         number_in_batch = ix[0]
         number_in_N = ix[1]
-        delta_arr = np.zeros(x.shape[1], dtype=np.float)
-        delta_arr[number_in_N] = delta
-        x1 = (x[number_in_batch] + delta_arr)
-        x2 = (x[number_in_batch] - delta_arr)
-        print('f(x1)', f(x1))
-        print('f(x2)', f(x2))
-        numeric_grad[ix] = (f(x1)[0] - f(x2)[0]) / (2 * delta)
+        # delta_arr = np.zeros(x.shape[1], dtype=np.float)
+        # delta_arr[number_in_N] = delta
+        # x1 = (x[number_in_batch] + delta_arr)
+        # x2 = (x[number_in_batch] - delta_arr)
+        xcopy = x.copy()
+        xcopy[ix] += delta
+        print('x1\n', xcopy)
+        fx1 = f(xcopy)[0]
+        xcopy[ix] -= delta * 2
+        print('x2\n', xcopy)
+        fx2 = f(xcopy)[0]
+        print('f(x1)', fx1)
+        print('f(x2)', fx2)
+        numeric_grad[ix] = (fx1 - fx2) / (2 * delta)
+        # print('f(x1)', f(x1))
+        # print('f(x2)', f(x2))
+        # numeric_grad[ix] = (f(x1)[0] - f(x2)[0]) / (2 * delta)
         # print('')
         # print('raw ng', numeric_grad_at_ix)
         # print(delta_arr)
         # print(f(x[i] + delta_arr)[0], f(x[i] - delta_arr)[0], f(x + delta_arr)[0] - f(x - delta_arr)[0])
         it.iternext()
+    it.close()
 
     # DEBUG
     print('analytic_grad\n', analytic_grad, '\n')
     print('numeric_grad\n', numeric_grad, '\n')
+
+    if np.all(np.isclose(numeric_grad, analytic_grad)):
+        print("Gradient check passed!")
+        return True
+    else:
+        print("Gradients are different!")
+        return False
 
     # for i in analytic_grad.shape[1]:
     #     analytic_grad_at_ix = analytic_grad[]
@@ -147,8 +167,3 @@ def check_gradient_batch(f, x, delta=1e-5, tol=1e-4):
     #         print("Gradients at %s. Analytic: %2.5f, Numeric: %2.5f" % (
     #             ix, analytic_grad_at_ix, numeric_grad_at_ix))
     #     it.iternext()
-
-    print("Gradient check passed!")
-    it.close()
-
-    return True

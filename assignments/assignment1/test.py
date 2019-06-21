@@ -15,7 +15,7 @@ class TestGradientCheck(TestCase):
                                 [0, 1, 1, 1],
                                 [0, 2, -1, 2]], dtype=np.float)
         target_index = np.array([[2], [3], [2]])
-        self.assertTrue(check_gradient(lambda x: softmax_with_cross_entropy(x, target_index), predictions))
+        self.assertTrue(check_gradient(f=lambda x: softmax_with_cross_entropy(x, target_index), x=predictions))
 
 
 class TestLinearClassifer(TestCase):
