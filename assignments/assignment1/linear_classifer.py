@@ -39,10 +39,13 @@ def cross_entropy_loss(probs, target_index):
         return -np.log(probs[target_index])
     else:
         batch_size = target_index.shape[0]
-        # print(probs)
-        # print(target_index)
-        # print(probs[np.arange(batch_size), target_index])
-        return np.average(-np.log(probs[np.arange(batch_size), target_index]))
+
+        loss = np.average(-np.log(probs[np.arange(batch_size), np.ravel(target_index)]))
+        # print('probs\n', probs)
+        # print('target_index\n', target_index)
+        # print('probs[]\n', -np.log(probs[np.arange(batch_size), target_index]))
+        print('loss - ', loss)
+        return loss
 
     # Your final implementation shouldn't have any loops
 
@@ -70,7 +73,7 @@ def softmax_with_cross_entropy(predictions, target_index):
     # print('prediction  ', predictions)
     # print('target ind ', target_index)
     # print('probs ', probs)
-    # print('loss ', loss)
+    print('loss ', loss)
 
     if len(predictions.shape) == 1:
         dprediction[target_index] -= 1
@@ -80,7 +83,7 @@ def softmax_with_cross_entropy(predictions, target_index):
         for i in range(batch_size):
             dprediction[i, target_index[i]] -= 1
 
-    # print('dprediction ', dprediction, '\n')
+    # print('dprediction \n', dprediction, '\n')
     return loss, dprediction
 
 

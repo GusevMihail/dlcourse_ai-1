@@ -123,6 +123,8 @@ def check_gradient_batch(f, x, delta=1e-5, tol=1e-4):
         delta_arr[number_in_N] = delta
         x1 = (x[number_in_batch] + delta_arr)
         x2 = (x[number_in_batch] - delta_arr)
+        print('f(x1)', f(x1))
+        print('f(x2)', f(x2))
         numeric_grad[ix] = (f(x1)[0] - f(x2)[0]) / (2 * delta)
         # print('')
         # print('raw ng', numeric_grad_at_ix)

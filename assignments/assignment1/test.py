@@ -10,6 +10,13 @@ class TestGradientCheck(TestCase):
         self.assertTrue(check_gradient(f=lambda x: (np.sum(x), np.ones_like(x)), x=np.array([3.0, 2.0])))
         self.assertTrue(check_gradient(f=lambda x: (np.sum(x), np.ones_like(x)), x=np.array([[3.0, 2.0], [1.0, 0.0]])))
 
+    def test_on_array_1(self):
+        predictions = np.array([[1, 2, -1, 1],
+                                [0, 1, 1, 1],
+                                [0, 2, -1, 2]], dtype=np.float)
+        target_index = np.array([[2], [3], [2]])
+        self.assertTrue(check_gradient(lambda x: softmax_with_cross_entropy(x, target_index), predictions))
+
 
 class TestLinearClassifer(TestCase):
     def test_softmax(self):
@@ -52,7 +59,7 @@ class TestLinearClassifer(TestCase):
         for i in range(10):
             np.random.seed(i)
             input_data = np.random.randint(-100, 100, (num_classes,)).astype(np.float)
-            target_index = np.random.randint(0, num_classes-1)
+            target_index = np.random.randint(0, num_classes - 1)
             self.assertTrue(check_gradient(lambda x: f(x, target_index), input_data))
 
     def test_softmax_with_cross_entropy_batch(self):
@@ -62,5 +69,5 @@ class TestLinearClassifer(TestCase):
         for i in range(10):
             np.random.seed(i)
             input_data = np.random.randint(-100, 100, (num_classes,)).astype(np.float)
-            target_index = np.random.randint(0, num_classes-1)
+            target_index = np.random.randint(0, num_classes - 1)
             self.assertTrue(check_gradient(lambda x: f(x, target_index), input_data))
