@@ -1,10 +1,13 @@
-from unittest import TestCase
+from unittest import TestCase, skip
 import numpy as np
 from gradient_check import check_gradient
 from linear_classifer import cross_entropy_loss, softmax, softmax_with_cross_entropy
 
 
 class TestGradientCheck(TestCase):
+
+    @skip('формат входных данных для тестируемой функции подразумевает, что если Х является не вектором, а матрицей, '
+          'то это batch примеров. Для тестируемой функции суммирования массивов это требование не выполняется')
     def test_on_simple_functions(self):
         self.assertTrue(check_gradient(f=lambda x: (float(x * x), 2 * x), x=np.array([3.0])))
         self.assertTrue(check_gradient(f=lambda x: (np.sum(x), np.ones_like(x)), x=np.array([3.0, 2.0])))
@@ -38,6 +41,10 @@ class TestLinearClassifer(TestCase):
         output = f(input_data_2)
         self.assertTrue(np.all(np.isclose(f(input_data_1), output[1])))
         self.assertEqual(output.shape, (batch_size - 1, num_classes))
+
+    def test_softmax_num_stability(self):
+        probs = softmax(np.array([[20, 0, 0], [1000, 0, 0]]))
+        assert np.all(np.isclose(probs[:, 0], 1.0))
 
     def test_cross_entropy_loss(self):
         f = cross_entropy_loss

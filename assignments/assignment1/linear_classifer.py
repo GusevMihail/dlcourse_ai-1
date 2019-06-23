@@ -17,8 +17,12 @@ def softmax(predictions):
         ez = np.exp(predictions - np.max(predictions))
         return ez / np.sum(ez)
     else:
-        ez = np.exp(predictions - np.max(predictions))
-        return ez / np.sum(ez, axis=1)[:, np.newaxis]
+        batch_size = predictions.shape[0]
+        ez = np.exp(predictions - np.reshape(np.max(predictions, axis=1), (batch_size, 1)))
+        # ez = np.exp(predictions - np.max(predictions, axis=1))
+        # print(ez)
+        return ez / np.reshape(np.sum(ez, axis=1), (batch_size, 1))
+        # return ez / np.sum(ez, axis=1)[:, np.newaxis]
     # Your final implementation shouldn't have any loops
 
 

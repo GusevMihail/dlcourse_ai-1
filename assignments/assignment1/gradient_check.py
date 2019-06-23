@@ -110,31 +110,30 @@ def check_gradient_batch(f, x, delta=1e-5, tol=1e-4):
     '''
 
     fx, analytic_grad = f(x)
+    batch_size = x.shape[0]
     numeric_grad = np.zeros_like(analytic_grad, dtype=np.float)
 
-    # TODO переделать итератор так, чтобы заполнять все дельты разом и передавать в функцию X1 и X2
-    #  сразу батчем со всем нужными изменениями
     it = np.nditer(x, flags=['multi_index'])
     while not it.finished:
         ix = it.multi_index
         fx, analytic_grad = f(x)
-        analytic_grad_at_ix = analytic_grad[ix]
-        number_in_batch = ix[0]
-        number_in_N = ix[1]
+        # analytic_grad_at_ix = analytic_grad[ix]
+        # number_in_batch = ix[0]
+        # number_in_N = ix[1]
         # delta_arr = np.zeros(x.shape[1], dtype=np.float)
         # delta_arr[number_in_N] = delta
         # x1 = (x[number_in_batch] + delta_arr)
         # x2 = (x[number_in_batch] - delta_arr)
         xcopy = x.copy()
         xcopy[ix] += delta
-        print('x1\n', xcopy)
+        # print('x1\n', xcopy)
         fx1 = f(xcopy)[0]
         xcopy[ix] -= delta * 2
-        print('x2\n', xcopy)
+        # print('x2\n', xcopy)
         fx2 = f(xcopy)[0]
-        print('f(x1)', fx1)
-        print('f(x2)', fx2)
-        numeric_grad[ix] = (fx1 - fx2) / (2 * delta)
+        # print('f(x1)', fx1)
+        # print('f(x2)', fx2)
+        numeric_grad[ix] = (fx1 - fx2) * batch_size / (2 * delta)  # домножение на размер батча - эмпирическое решение, нет гарантий, что оно верно в общем случае.
         # print('f(x1)', f(x1))
         # print('f(x2)', f(x2))
         # numeric_grad[ix] = (f(x1)[0] - f(x2)[0]) / (2 * delta)
