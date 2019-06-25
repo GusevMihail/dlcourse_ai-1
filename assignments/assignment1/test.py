@@ -1,5 +1,7 @@
 from unittest import TestCase, skip
 import numpy as np
+
+import linear_classifer
 from gradient_check import check_gradient
 from linear_classifer import cross_entropy_loss, softmax, softmax_with_cross_entropy
 
@@ -68,6 +70,9 @@ class TestLinearClassifer(TestCase):
             input_data = np.random.randint(-100, 100, (num_classes,)).astype(np.float)
             target_index = np.random.randint(0, num_classes - 1)
             self.assertTrue(check_gradient(lambda x: f(x, target_index), input_data))
+            loss, dpredictions = f(input_data, target_index)
+            self.assertEqual(dpredictions.shape, input_data.shape)
+            self.assertIsInstance(loss, float)
 
     def test_softmax_with_cross_entropy_batch(self):
         f = softmax_with_cross_entropy
@@ -78,3 +83,15 @@ class TestLinearClassifer(TestCase):
             input_data = np.random.randint(-100, 100, (num_classes,)).astype(np.float)
             target_index = np.random.randint(0, num_classes - 1)
             self.assertTrue(check_gradient(lambda x: f(x, target_index), input_data))
+
+    def test_(self):
+        batch_size = 2
+        num_classes = 2
+        num_features = 3
+        np.random.seed(42)
+        W = np.random.randint(-1, 3, size=(num_features, num_classes)).astype(np.float)
+        X = np.random.randint(-1, 3, size=(batch_size, num_features)).astype(np.float)
+        target_index = np.ones(batch_size, dtype=np.int)
+
+        loss, dW = linear_classifer.linear_softmax(X, W, target_index)
+        self.assertTrue(check_gradient(lambda w: linear_classifer.linear_softmax(X, w, target_index), W))
