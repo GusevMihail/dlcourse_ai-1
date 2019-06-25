@@ -84,13 +84,13 @@ class TestLinearClassifer(TestCase):
             target_index = np.random.randint(0, num_classes - 1)
             self.assertTrue(check_gradient(lambda x: f(x, target_index), input_data))
 
-    def test_(self):
+    def test_linear_softmax(self):
         batch_size = 2
         num_classes = 2
         num_features = 3
         np.random.seed(42)
-        W = np.random.randint(-1, 3, size=(num_features, num_classes)).astype(np.float)
         X = np.random.randint(-1, 3, size=(batch_size, num_features)).astype(np.float)
+        W = np.random.randint(-1, 3, size=(num_features, num_classes)).astype(np.float)
         target_index = np.ones(batch_size, dtype=np.int)
 
         loss, dW = linear_classifer.linear_softmax(X, W, target_index)
