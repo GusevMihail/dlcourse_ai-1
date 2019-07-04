@@ -7,7 +7,7 @@ def check_gradient(f, x, delta=1e-5, tol=1e-4):
     it to numerical gradient using two-point formula
 
     Arguments:
-      f: function that receives x and computes value and gradient
+      f: function that receives X and computes value and gradient
       x: np array, initial point where gradient is checked
       delta: step to compute numerical gradient
       tol: tolerance for comparing numerical and analytical gradient

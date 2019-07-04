@@ -7,7 +7,7 @@ def check_gradient(f, x, delta=1e-5, tol=1e-4):
     it to numerical gradient using two-point formula
 
     Arguments:
-      f: function that receives x and computes value and gradient
+      f: function that receives X and computes value and gradient
       x: np array, initial point where gradient is checked
       delta: step to compute numerical gradient
       tol: tolerance for comparing numerical and analytical gradient
@@ -39,7 +39,7 @@ def check_gradient_single(f, x, delta=1e-5, tol=1e-4):
     it to numerical gradient using two-point formula
 
     Arguments:
-      f: function that receives x and computes value and gradient
+      f: function that receives X and computes value and gradient
       x: np array, shape is either (N) or (batch_size, N) - initial point where gradient is checked
       delta: step to compute numerical gradient
       tol: tolerance for comparing numerical and analytical gradient
@@ -62,7 +62,7 @@ def check_gradient_single(f, x, delta=1e-5, tol=1e-4):
         numeric_grad_at_ix = (f(x1)[0] - f(x2)[0]) / (2 * delta)
         # print('')
         # print(delta_arr)
-        # print(f(x[i] + delta_arr)[0], f(x[i] - delta_arr)[0], f(x + delta_arr)[0] - f(x - delta_arr)[0])
+        # print(f(X[i] + delta_arr)[0], f(X[i] - delta_arr)[0], f(X + delta_arr)[0] - f(X - delta_arr)[0])
         # print('ng', numeric_grad_at_ix)
         # print('ag', analytic_grad_at_ix)
         if not np.isclose(numeric_grad_at_ix, analytic_grad_at_ix, tol):
@@ -86,7 +86,7 @@ def check_gradient_batch(f, x, delta=1e-5, tol=1e-4):
     it to numerical gradient using two-point formula
 
     Arguments:
-      f: function that receives x and computes value and gradient
+      f: function that receives X and computes value and gradient
       x: np array, shape is (batch_size, N) - initial point where gradient is checked
       delta: step to compute numerical gradient
       tol: tolerance for comparing numerical and analytical gradient
@@ -156,9 +156,7 @@ def check_layer_gradient(layer, x, delta=1e-5, tol=1e-4):
     return check_gradient(helper_func, x, delta, tol)
 
 
-def check_layer_param_gradient(layer, x,
-                               param_name,
-                               delta=1e-5, tol=1e-4):
+def check_layer_param_gradient(layer, x, param_name, delta=1e-5, tol=1e-4):
     """
     Checks gradient correctness for the parameter of the layer
 

@@ -120,7 +120,7 @@ class ConvolutionalLayer:
         
         # TODO: Implement forward pass
         # Hint: setup variables that hold the result
-        # and one x/y location at a time in the loop below
+        # and one X/y location at a time in the loop below
         
         # It's ok to use loops for going over width and height
         # but try to avoid having any other loops
@@ -176,7 +176,7 @@ class MaxPoolingLayer:
         batch_size, height, width, channels = X.shape
         # TODO: Implement maxpool forward pass
         # Hint: Similarly to Conv layer, loop on
-        # output x/y dimension
+        # output X/y dimension
         raise Exception("Not implemented!")
 
     def backward(self, d_out):

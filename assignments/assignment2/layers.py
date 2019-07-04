@@ -1,4 +1,5 @@
 import numpy as np
+import assignment1.linear_classifer
 
 
 def l2_regularization(W, reg_strength):
@@ -14,7 +15,7 @@ def l2_regularization(W, reg_strength):
       gradient, np.array same shape as W - gradient of weight by l2 loss
     """
     # TODO: Copy from the previous assignment
-    raise Exception("Not implemented!")
+    loss, grad = assignment1.linear_classifer.l2_regularization(W, reg_strength)
     return loss, grad
 
 
@@ -34,7 +35,7 @@ def softmax_with_cross_entropy(preds, target_index):
       dprediction, np array same shape as predictions - gradient of predictions by loss value
     """
     # TODO: Copy from the previous assignment
-    raise Exception("Not implemented!")
+    loss, d_preds = assignment1.linear_classifer.softmax_with_cross_entropy(preds, target_index)
 
     return loss, d_preds
 
@@ -52,13 +53,17 @@ class Param:
 
 class ReLULayer:
     def __init__(self):
-        pass
+        self.X = None
 
     def forward(self, X):
         # TODO: Implement forward pass
         # Hint: you'll need to save some information about X
         # to use it later in the backward pass
-        raise Exception("Not implemented!")
+        self.X = np.copy(X)
+        negative_elements = X < 0
+        result = np.copy(X)
+        result[negative_elements] = 0
+        return result
 
     def backward(self, d_out):
         """
@@ -73,8 +78,9 @@ class ReLULayer:
           with respect to input
         """
         # TODO: Implement backward pass
-        # Your final implementation shouldn't have any loops
-        raise Exception("Not implemented!")
+        d_result = np.ones_like(self.X)
+        negative_elements = self.X < 0
+        d_result[negative_elements] = 0
         return d_result
 
     def params(self):
