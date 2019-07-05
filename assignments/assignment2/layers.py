@@ -14,7 +14,6 @@ def l2_regularization(W, reg_strength):
       loss, single value - l2 regularization loss
       gradient, np.array same shape as W - gradient of weight by l2 loss
     """
-    # TODO: Copy from the previous assignment
     loss, grad = assignment1.linear_classifer.l2_regularization(W, reg_strength)
     return loss, grad
 
@@ -34,7 +33,6 @@ def softmax_with_cross_entropy(preds, target_index):
       loss, single value - cross-entropy loss
       dprediction, np array same shape as predictions - gradient of predictions by loss value
     """
-    # TODO: Copy from the previous assignment
     loss, d_preds = assignment1.linear_classifer.softmax_with_cross_entropy(preds, target_index)
 
     return loss, d_preds
@@ -78,9 +76,9 @@ class ReLULayer:
           with respect to input
         """
         # TODO: Implement backward pass
-        d_result = np.ones_like(self.X)
-        negative_elements = self.X < 0
-        d_result[negative_elements] = 0
+        d_result = np.copy(d_out)
+        negative_elements_mask = self.X < 0
+        d_result[negative_elements_mask] = 0
         return d_result
 
     def params(self):
