@@ -81,6 +81,7 @@ class ReLULayer:
         d_result = np.ones_like(self.X)
         negative_elements = self.X < 0
         d_result[negative_elements] = 0
+        d_result *= d_out
         return d_result
 
     def params(self):
