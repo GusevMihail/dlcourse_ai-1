@@ -17,8 +17,10 @@ class TwoLayerNet:
         reg, float - L2 regularization strength
         """
         self.reg = reg
-        # TODO Create necessary layers
-        raise Exception("Not implemented!")
+        fc_layer_1 = FullyConnectedLayer(n_input, hidden_layer_size)
+        relu_layer_1 = ReLULayer()
+        fc_layer_2 = FullyConnectedLayer(hidden_layer_size, n_output)
+
 
     def compute_loss_and_gradients(self, X, y):
         """
