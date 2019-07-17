@@ -14,7 +14,7 @@ def l2_regularization(W, reg_strength):
       loss, single value - l2 regularization loss
       gradient, np.array same shape as W - gradient of weight by l2 loss
     """
-    # TODO: Copy from the previous assignment
+    # TO DO: Copy from the previous assignment
     loss, grad = assignment1.linear_classifer.l2_regularization(W, reg_strength)
     return loss, grad
 
@@ -34,7 +34,7 @@ def softmax_with_cross_entropy(preds, target_index):
       loss, single value - cross-entropy loss
       dprediction, np array same shape as predictions - gradient of predictions by loss value
     """
-    # TODO: Copy from the previous assignment
+    # TO DO: Copy from the previous assignment
     loss, d_preds = assignment1.linear_classifer.softmax_with_cross_entropy(preds, target_index)
 
     return loss, d_preds
@@ -56,7 +56,7 @@ class ReLULayer:
         self.X = None
 
     def forward(self, X):
-        # TODO: Implement forward pass
+        # TO DO: Implement forward pass
         # Hint: you'll need to save some information about X
         # to use it later in the backward pass
         self.X = np.copy(X)
@@ -77,7 +77,6 @@ class ReLULayer:
         d_result: np array (batch_size, num_features) - gradient
           with respect to input
         """
-        # TODO: Implement backward pass
         d_result = np.ones_like(self.X)
         negative_elements = self.X < 0
         d_result[negative_elements] = 0
@@ -98,7 +97,8 @@ class FullyConnectedLayer:
     def forward(self, X):
         # TODO: Implement forward pass
         # Your final implementation shouldn't have any loops
-        raise Exception("Not implemented!")
+        self.X = np.copy(X)
+        return np.dot(self.X, self.W.value) + self.B.value
 
     def backward(self, d_out):
         """
@@ -122,7 +122,9 @@ class FullyConnectedLayer:
         # It should be pretty similar to linear classifier from
         # the previous assignment
 
-        raise Exception("Not implemented!")
+        d_input = np.dot(d_out, np.transpose(self.W.value))
+        self.W.grad = np.dot(np.transpose(self.X), d_out)
+        self.B.grad = d_out.sum(axis=0).reshape(self.B.value.shape)
 
         return d_input
 
