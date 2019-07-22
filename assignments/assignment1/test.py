@@ -22,6 +22,17 @@ class TestGradientCheck(TestCase):
         target_index = np.array([[2], [3], [2]])
         self.assertTrue(check_gradient(f=lambda x: softmax_with_cross_entropy(x, target_index), x=predictions))
 
+    # def test_on_array_sum(self):
+    #     def X_plus_B(X, B):
+    #         result = X + B
+    #         dX = np.zeros_like(X)
+    #         return result, dX
+    #     shape = [2, 3]
+    #     test_point = np.random.randint(-5, 5, shape)*1.0
+    #     B = np.random.randint(-5, 5, shape)
+    #     self.assertTrue(check_gradient(f=lambda x: X_plus_B(x, B), x=test_point))
+
+
 
 class TestLinearClassifer(TestCase):
     def test_softmax(self):

@@ -81,6 +81,7 @@ class ReLULayer:
         negative_elements = self.X < 0
         d_result[negative_elements] = 0
         d_result *= d_out
+        assert d_result.shape == d_out.shape
         return d_result
 
     def params(self):
@@ -129,4 +130,5 @@ class FullyConnectedLayer:
         return d_input
 
     def params(self):
-        return {'W': self.W, 'B': self.B}
+        params = {'W': self.W, 'B': self.B}
+        return params
