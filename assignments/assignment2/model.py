@@ -1,6 +1,6 @@
 import numpy as np
 
-from layers import FullyConnectedLayer, ReLULayer, softmax_with_cross_entropy, l2_regularization
+from layers import FullyConnectedLayer, ReLULayer, softmax_with_cross_entropy, l2_regularization, Param
 
 
 class TwoLayerNet:
@@ -37,6 +37,14 @@ class TwoLayerNet:
         d_fc1 = self.fc_layer_1.backward(d_relu1)
         return d_fc1
 
+    def l2_regularization(self):
+        l2_loss = 0
+        for param in self.params().values():
+            loss, grad = l2_regularization(param.value, self.reg)
+            param.grad += grad
+            l2_loss += loss
+        return l2_loss
+
     def compute_loss_and_gradients(self, X, y):
         """
         Computes total loss and updates parameter gradients
@@ -58,9 +66,11 @@ class TwoLayerNet:
         softmax_loss, d_preds = softmax_with_cross_entropy(preds, y)
         d_X = self.backward(d_preds)
 
-        loss = softmax_loss  # temp code
         # After that, implement l2 regularization on all params
         # Hint: self.params() is useful again!
+        l2_loss = self.l2_regularization()
+
+        loss = softmax_loss + l2_loss
 
         return loss
 
@@ -79,13 +89,11 @@ class TwoLayerNet:
         #         # can be reused
         pred = np.zeros(X.shape[0], np.int)
 
-        raise Exception("Not implemented!")
-        return pred
+        preds = self.forward(X)
+        y_pred = np.argmax(preds, axis=1)
+        return y_pred
 
     def params(self):
-        # result = list(self.fc_layer_1.params().values()) + \
-        #          list(self.fc_layer_2.params().values()) + \
-        #          list(self.relu_layer_1.params().values())
         result = {}
 
         def rename_keys(input_dict: dict, key_prefix: str) -> dict:
