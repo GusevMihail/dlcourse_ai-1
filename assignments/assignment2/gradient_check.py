@@ -53,7 +53,7 @@ def check_gradient_single(f, x, delta=1e-5, tol=1e-4):
     it = np.nditer(x, flags=['multi_index'])
     while not it.finished:
         ix = it.multi_index
-        fx, analytic_grad = f(x)
+        # fx, analytic_grad = f(x)
         analytic_grad_at_ix = analytic_grad[ix]
         delta_arr = np.zeros(x.shape, dtype=np.float)
         delta_arr[ix] = delta
@@ -96,13 +96,14 @@ def check_gradient_batch(f, x, delta=1e-5, tol=1e-4):
     '''
 
     fx, analytic_grad = f(x)
+    analytic_grad = analytic_grad.copy()
     batch_size = x.shape[0]
     numeric_grad = np.zeros_like(analytic_grad, dtype=np.float)
 
     it = np.nditer(x, flags=['multi_index'])
     while not it.finished:
         ix = it.multi_index
-        fx, analytic_grad = f(x)
+        # fx, analytic_grad = f(x)
 
         xcopy = x.copy()
         xcopy[ix] += delta
