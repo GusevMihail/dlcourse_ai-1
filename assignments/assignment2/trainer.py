@@ -2,6 +2,7 @@ from copy import deepcopy
 
 import numpy as np
 from metrics import multiclass_accuracy
+from model import TwoLayerNet
 
 
 class Dataset:
@@ -23,7 +24,7 @@ class Trainer:
     training parameters and optimization rule
     """
 
-    def __init__(self, model, dataset, optim,
+    def __init__(self, model: TwoLayerNet, dataset: Dataset, optim,
                  num_epochs=20,
                  batch_size=20,
                  learning_rate=1e-2,
@@ -86,7 +87,7 @@ class Trainer:
         loss_history = []
         train_acc_history = []
         val_acc_history = []
-        
+
         for epoch in range(self.num_epochs):
             shuffled_indices = np.arange(num_train)
             np.random.shuffle(shuffled_indices)
@@ -99,18 +100,21 @@ class Trainer:
                 # TODO Generate batches based on batch_indices and
                 # use model to generate loss and gradients for all
                 # the params
-
-                raise Exception("Not implemented!")
+                batch_X = self.dataset.train_X[batch_indices]
+                batch_y = self.dataset.train_y[batch_indices]
+                loss = self.model.compute_loss_and_gradients(batch_X, batch_y)
 
                 for param_name, param in self.model.params().items():
                     optimizer = self.optimizers[param_name]
-                    param.value = optimizer.update(param.value, param.grad, self.learning_rate)
+                    new_param_value = optimizer.update(param.value, param.grad, self.learning_rate)
+                    # print(f'param {param_name}.value {param.value[0,0]}->{new_param_value[0,0]}, grad={param.grad[0,0]}, lr={self.learning_rate}')
+                    param.value = new_param_value
 
                 batch_losses.append(loss)
 
             if np.not_equal(self.learning_rate_decay, 1.0):
                 # TODO: Implement learning rate decay
-                raise Exception("Not implemented!")
+                self.learning_rate *= self.learning_rate_decay
 
             ave_loss = np.mean(batch_losses)
 
@@ -120,8 +124,8 @@ class Trainer:
             val_accuracy = self.compute_accuracy(self.dataset.val_X,
                                                  self.dataset.val_y)
 
-            print("Loss: %f, Train accuracy: %f, val accuracy: %f" %
-                  (batch_losses[-1], train_accuracy, val_accuracy))
+            print("Loss: %f, Train accuracy: %f, val accuracy: %f, lr: %f" %
+                  (batch_losses[-1], train_accuracy, val_accuracy, self.learning_rate))
 
             loss_history.append(ave_loss)
             train_acc_history.append(train_accuracy)

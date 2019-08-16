@@ -1,4 +1,7 @@
-def multiclass_accuracy(prediction, ground_truth):
+import numpy as np
+
+
+def multiclass_accuracy(prediction: np.array, ground_truth: np.array):
     """
     Computes metrics for multiclass classification
 
@@ -11,6 +14,9 @@ def multiclass_accuracy(prediction, ground_truth):
     """
 
     # TODO: Implement computing accuracy
-    raise Exception("Not implemented!")
+    total_samples = prediction.shape[0]
+    accurate_predictions = (prediction == ground_truth).sum()  # неактульный варнинг.
+    # Результат сравнения двух np.array - это np.array(bool), а не bool
+    accuracy = accurate_predictions / total_samples
+    return accuracy
 
-    return 0
