@@ -1,43 +1,82 @@
 import numpy as np
 
+from assignment2.layers import l2_regularization, softmax_with_cross_entropy, ReLULayer, FullyConnectedLayer
 
-def l2_regularization(W, reg_strength):
-    '''
-    Computes L2 regularization loss on weights and its gradient
+# def l2_regularization(W, reg_strength):
+#     '''
+#     Computes L2 regularization loss on weights and its gradient
+#
+#     Arguments:
+#       W, np array - weights
+#       reg_strength - float value
+#
+#     Returns:
+#       loss, single value - l2 regularization loss
+#       gradient, np.array same shape as W - gradient of weight by l2 loss
+#     '''
+#     # TODO: Copy from previous assignment
+#     raise Exception("Not implemented!")
+#
+#     return loss, grad
+#
+#
+# def softmax_with_cross_entropy(predictions, target_index):
+#     '''
+#     Computes softmax and cross-entropy loss for model predictions,
+#     including the gradient
+#
+#     Arguments:
+#       predictions, np array, shape is either (N) or (batch_size, N) -
+#         classifier output
+#       target_index: np array of int, shape is (1) or (batch_size) -
+#         index of the true class for given sample(s)
+#
+#     Returns:
+#       loss, single value - cross-entropy loss
+#       dprediction, np array same shape as predictions - gradient of predictions by loss value
+#     '''
+#     # TODO copy from the previous assignment
+#     raise Exception("Not implemented!")
+#     return loss, dprediction
+#
 
-    Arguments:
-      W, np array - weights
-      reg_strength - float value
 
-    Returns:
-      loss, single value - l2 regularization loss
-      gradient, np.array same shape as W - gradient of weight by l2 loss
-    '''
-    # TODO: Copy from previous assignment
-    raise Exception("Not implemented!")
+        
+# class ReLULayer:
+#     def __init__(self):
+#         pass
+#
+#     def forward(self, X):
+#         # TODO copy from the previous assignment
+#         raise Exception("Not implemented!")
+#
+#     def backward(self, d_out):
+#         # TODO copy from the previous assignment
+#         raise Exception("Not implemented!")
+#         return d_result
+#
+#     def params(self):
+#         return {}
 
-    return loss, grad
 
-
-def softmax_with_cross_entropy(predictions, target_index):
-    '''
-    Computes softmax and cross-entropy loss for model predictions,
-    including the gradient
-
-    Arguments:
-      predictions, np array, shape is either (N) or (batch_size, N) -
-        classifier output
-      target_index: np array of int, shape is (1) or (batch_size) -
-        index of the true class for given sample(s)
-
-    Returns:
-      loss, single value - cross-entropy loss
-      dprediction, np array same shape as predictions - gradient of predictions by loss value
-    '''
-    # TODO copy from the previous assignment
-    raise Exception("Not implemented!")
-    return loss, dprediction
-
+# class FullyConnectedLayer:
+#     def __init__(self, n_input, n_output):
+#         self.W = Param(0.001 * np.random.randn(n_input, n_output))
+#         self.B = Param(0.001 * np.random.randn(1, n_output))
+#         self.X = None
+#
+#     def forward(self, X):
+#         # TODO copy from the previous assignment
+#         raise Exception("Not implemented!")
+#
+#     def backward(self, d_out):
+#         # TODO copy from the previous assignment
+#
+#         raise Exception("Not implemented!")
+#         return d_input
+#
+#     def params(self):
+#         return { 'W': self.W, 'B': self.B }
 
 class Param:
     '''
@@ -48,50 +87,12 @@ class Param:
         self.value = value
         self.grad = np.zeros_like(value)
 
-        
-class ReLULayer:
-    def __init__(self):
-        pass
-
-    def forward(self, X):
-        # TODO copy from the previous assignment
-        raise Exception("Not implemented!")
-
-    def backward(self, d_out):
-        # TODO copy from the previous assignment
-        raise Exception("Not implemented!")
-        return d_result
-
-    def params(self):
-        return {}
-
-
-class FullyConnectedLayer:
-    def __init__(self, n_input, n_output):
-        self.W = Param(0.001 * np.random.randn(n_input, n_output))
-        self.B = Param(0.001 * np.random.randn(1, n_output))
-        self.X = None
-
-    def forward(self, X):
-        # TODO copy from the previous assignment
-        raise Exception("Not implemented!")
-
-    def backward(self, d_out):
-        # TODO copy from the previous assignment
-        
-        raise Exception("Not implemented!")        
-        return d_input
-
-    def params(self):
-        return { 'W': self.W, 'B': self.B }
-
-    
 class ConvolutionalLayer:
     def __init__(self, in_channels, out_channels,
                  filter_size, padding):
         '''
         Initializes the layer
-        
+
         Arguments:
         in_channels, int - number of input channels
         out_channels, int - number of output channels
@@ -117,11 +118,11 @@ class ConvolutionalLayer:
 
         out_height = 0
         out_width = 0
-        
+
         # TODO: Implement forward pass
         # Hint: setup variables that hold the result
         # and one X/y location at a time in the loop below
-        
+
         # It's ok to use loops for going over width and height
         # but try to avoid having any other loops
         for y in range(out_height):
