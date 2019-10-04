@@ -2,6 +2,7 @@ import numpy as np
 
 from assignment2.layers import l2_regularization, softmax_with_cross_entropy, ReLULayer, FullyConnectedLayer
 
+
 # def l2_regularization(W, reg_strength):
 #     '''
 #     Computes L2 regularization loss on weights and its gradient
@@ -41,7 +42,6 @@ from assignment2.layers import l2_regularization, softmax_with_cross_entropy, Re
 #
 
 
-        
 # class ReLULayer:
 #     def __init__(self):
 #         pass
@@ -83,9 +83,11 @@ class Param:
     Trainable parameter of the model
     Captures both parameter value and the gradient
     '''
+
     def __init__(self, value):
         self.value = value
         self.grad = np.zeros_like(value)
+
 
 class ConvolutionalLayer:
     def __init__(self, in_channels, out_channels,
@@ -112,12 +114,15 @@ class ConvolutionalLayer:
 
         self.padding = padding
 
+        self.X = None
 
     def forward(self, X):
-        batch_size, height, width, channels = X.shape
+        self.X = X
+        batch_size, height, width, channels = self.X.shape
 
-        out_height = 0
-        out_width = 0
+        out_height = height - self.filter_size + 1
+        out_width = width - self.filter_size + 1
+        out = np.array([out_width, out_height])
 
         # TODO: Implement forward pass
         # Hint: setup variables that hold the result
@@ -125,12 +130,17 @@ class ConvolutionalLayer:
 
         # It's ok to use loops for going over width and height
         # but try to avoid having any other loops
+        shift_1 = self.filter_size - self.filter_size // 2 - 1
+        shift_2 = self.filter_size // 2 + 1
         for y in range(out_height):
             for x in range(out_width):
-                # TODO: Implement forward pass for specific location
-                pass
-        raise Exception("Not implemented!")
+                X1 = X[:, x - shift_1:x + shift_2, y - shift_1:y + shift_2, :]
+                out[x, y] = np.sum(
+                        np.dot(X1.reshape([batch_size, self.filter_size ** 2 * channels]),
+                                   self.W.value.reshape([self.filter_size ** 2 * self.in_channels, self.out_channels])
+                                   ) + self.B.value)
 
+        return out.reshape([batch_size, self.filter_size, self.filter_size, self.out_channels])
 
     def backward(self, d_out):
         # Hint: Forward pass was reduced to matrix multiply
@@ -138,7 +148,7 @@ class ConvolutionalLayer:
         # when you implemented FullyConnectedLayer
         # Just do it the same number of times and accumulate gradients
 
-        batch_size, height, width, channels = X.shape
+        batch_size, height, width, channels = self.X.shape
         _, out_height, out_width, out_channels = d_out.shape
 
         # TODO: Implement backward pass
@@ -157,7 +167,7 @@ class ConvolutionalLayer:
         raise Exception("Not implemented!")
 
     def params(self):
-        return { 'W': self.W, 'B': self.B }
+        return {'W': self.W, 'B': self.B}
 
 
 class MaxPoolingLayer:
