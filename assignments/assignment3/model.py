@@ -1,6 +1,6 @@
 import numpy as np
 
-from layers import (
+from assignment3.layers import (
     FullyConnectedLayer, ReLULayer,
     ConvolutionalLayer, MaxPoolingLayer, Flattener,
     softmax_with_cross_entropy, l2_regularization
