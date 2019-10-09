@@ -122,9 +122,9 @@ class ConvolutionalLayer:
 
         out_height = height - self.filter_size + 1
         out_width = width - self.filter_size + 1
-        out = np.array([out_width, out_height])
+        out = np.zeros([batch_size, out_width, out_height, self.out_channels])
 
-        # TODO: Implement forward pass
+        # TO DO: Implement forward pass
         # Hint: setup variables that hold the result
         # and one X/y location at a time in the loop below
 
@@ -134,13 +134,12 @@ class ConvolutionalLayer:
         shift_2 = self.filter_size // 2 + 1
         for y in range(out_height):
             for x in range(out_width):
-                X1 = X[:, x - shift_1:x + shift_2, y - shift_1:y + shift_2, :]
-                out[x, y] = np.sum(
-                        np.dot(X1.reshape([batch_size, self.filter_size ** 2 * channels]),
-                                   self.W.value.reshape([self.filter_size ** 2 * self.in_channels, self.out_channels])
-                                   ) + self.B.value)
-
-        return out.reshape([batch_size, self.filter_size, self.filter_size, self.out_channels])
+                Xc = X[:, x - shift_1:x + shift_2, y - shift_1:y + shift_2, :]  # X crop
+                Xcr = Xc.reshape([batch_size, self.filter_size ** 2 * self.in_channels])  # X crop reshaped
+                Wr = self.W.value.reshape([self.filter_size ** 2 * self.in_channels, self.out_channels])  # W reshaped
+                XWB = np.dot(Xcr, Wr) + self.B.value
+                out[:, x, y, :] = XWB
+        return out
 
     def backward(self, d_out):
         # Hint: Forward pass was reduced to matrix multiply
@@ -156,13 +155,34 @@ class ConvolutionalLayer:
         # aggregate input gradient and fill them for every location
         # of the output
 
+        d_input = np.zeros_like(self.X)
+        shift_1 = self.filter_size - self.filter_size // 2 - 1
+        shift_2 = self.filter_size // 2 + 1
         # Try to avoid having any other loops here too
         for y in range(out_height):
             for x in range(out_width):
                 # TODO: Implement backward pass for specific location
                 # Aggregate gradients for both the input and
                 # the parameters (W and B)
-                pass
+                Wr = self.W.value.reshape([self.filter_size ** 2 * self.in_channels, self.out_channels])  # W reshaped
+                Wrt = np.transpose(Wr)  # W reshaped transposed
+                d_input_c = np.dot(d_out[:, x, y, :], Wrt)  # dX cropped
+                d_input_cr = d_input_c.reshape(
+                    [batch_size, self.filter_size, self.filter_size, self.in_channels])  # dX cropped reshaped
+                d_input[:, x - shift_1:x + shift_2, y - shift_1:y + shift_2, :] += d_input_cr  # dX
+
+                Xc = self.X[:, x - shift_1:x + shift_2, y - shift_1:y + shift_2, :]  # X crop
+                Xcr = Xc.reshape([batch_size, self.filter_size ** 2 * self.in_channels])  # X crop reshaped
+                Xcrt = np.transpose(Xcr)  # X cropped reshaped transposed
+                dW = np.dot(Xcrt, d_out[:, x, y, :])  # dW for one sample of d_input
+                dWr = dW.reshape(
+                    [self.filter_size, self.filter_size, self.in_channels, self.out_channels])  # dW cropped reshaped
+                self.W.grad += dWr  # accumulate dW
+
+                # self.W.grad[:, x, y, :] += np.dot(np.swapaxes(self.X, 2, 3), d_out)
+                # self.B.grad[:, x, y, :] += d_out.sum(axis=0).reshape(self.B.value.shape)
+
+        return d_input
 
         raise Exception("Not implemented!")
 
