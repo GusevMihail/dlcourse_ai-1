@@ -42,7 +42,7 @@ import numpy as np
 #     print("Gradient check passed!")
 #     return True
 
-from assignment2.gradient_check import check_gradient as check_gradient
+from assignment2.gradient_check import check_gradient
 
 
 def check_layer_gradient(layer, x, delta=1e-5, tol=1e-4):

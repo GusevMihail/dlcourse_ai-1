@@ -79,10 +79,10 @@ from assignment2.layers import l2_regularization, softmax_with_cross_entropy, Re
 #         return { 'W': self.W, 'B': self.B }
 
 class Param:
-    '''
+    """
     Trainable parameter of the model
     Captures both parameter value and the gradient
-    '''
+    """
 
     def __init__(self, value):
         self.value = value
@@ -92,7 +92,7 @@ class Param:
 class ConvolutionalLayer:
     def __init__(self, in_channels, out_channels,
                  filter_size, padding):
-        '''
+        """
         Initializes the layer
 
         Arguments:
@@ -100,7 +100,7 @@ class ConvolutionalLayer:
         out_channels, int - number of output channels
         filter_size, int - size of the conv filter
         padding, int - number of 'pixels' to pad on each side
-        '''
+        """
 
         self.filter_size = filter_size
         self.in_channels = in_channels
@@ -177,14 +177,13 @@ class ConvolutionalLayer:
                 dW = np.dot(Xcrt, d_out[:, x, y, :])  # dW for one sample of d_input
                 dWr = dW.reshape(
                     [self.filter_size, self.filter_size, self.in_channels, self.out_channels])  # dW cropped reshaped
-                self.W.grad += dWr  # accumulate dW
-
-                # self.W.grad[:, x, y, :] += np.dot(np.swapaxes(self.X, 2, 3), d_out)
-                # self.B.grad[:, x, y, :] += d_out.sum(axis=0).reshape(self.B.value.shape)
+                self.W.grad += dWr / batch_size  # accumulate dW.
+                # !Деление на BatchSize - эмпирическое решение, нет гарантий, что оно верно!
+                d_out_r = d_out.reshape([batch_size * out_height * out_width, out_channels])
+                self.B.grad += d_out.sum(axis=0).reshape(self.B.value.shape) / batch_size
+                # !Деление на BatchSize - эмпирическое решение, нет гарантий, что оно верно!
 
         return d_input
-
-        raise Exception("Not implemented!")
 
     def params(self):
         return {'W': self.W, 'B': self.B}
@@ -192,13 +191,13 @@ class ConvolutionalLayer:
 
 class MaxPoolingLayer:
     def __init__(self, pool_size, stride):
-        '''
+        """
         Initializes the max pool
 
         Arguments:
         pool_size, int - area to pool
         stride, int - step size between pooling windows
-        '''
+        """
         self.pool_size = pool_size
         self.stride = stride
         self.X = None
@@ -228,7 +227,7 @@ class Flattener:
 
         # TODO: Implement forward pass
         # Layer should return array with dimensions
-        # [batch_size, hight*width*channels]
+        # [batch_size, height*width*channels]
         raise Exception("Not implemented!")
 
     def backward(self, d_out):
