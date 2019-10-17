@@ -117,7 +117,10 @@ class ConvolutionalLayer:
         self.X = None
 
     def forward(self, X):
-        self.X = X
+        batch_size, height, width, channels = X.shape
+        p = self.padding
+        self.X = np.zeros([batch_size, height + 2 * p, width + 2 * p, channels])
+        self.X[:, p:p + height, p:p + width, :] = X
         batch_size, height, width, channels = self.X.shape
 
         out_height = height - self.filter_size + 1
@@ -134,11 +137,12 @@ class ConvolutionalLayer:
         shift_2 = self.filter_size // 2 + 1
         for y in range(out_height):
             for x in range(out_width):
-                Xc = X[:, x - shift_1:x + shift_2, y - shift_1:y + shift_2, :]  # X crop
+                Xc = self.X[:, x:x + self.filter_size, y:y + self.filter_size, :]  # X crop
                 Xcr = Xc.reshape([batch_size, self.filter_size ** 2 * self.in_channels])  # X crop reshaped
                 Wr = self.W.value.reshape([self.filter_size ** 2 * self.in_channels, self.out_channels])  # W reshaped
                 XWB = np.dot(Xcr, Wr) + self.B.value
                 out[:, x, y, :] = XWB
+        # print(self.X[0, :, :, 0])
         return out
 
     def backward(self, d_out):
@@ -156,8 +160,6 @@ class ConvolutionalLayer:
         # of the output
 
         d_input = np.zeros_like(self.X)
-        shift_1 = self.filter_size - self.filter_size // 2 - 1
-        shift_2 = self.filter_size // 2 + 1
         # Try to avoid having any other loops here too
         for y in range(out_height):
             for x in range(out_width):
@@ -169,9 +171,9 @@ class ConvolutionalLayer:
                 d_input_c = np.dot(d_out[:, x, y, :], Wrt)  # dX cropped
                 d_input_cr = d_input_c.reshape(
                     [batch_size, self.filter_size, self.filter_size, self.in_channels])  # dX cropped reshaped
-                d_input[:, x - shift_1:x + shift_2, y - shift_1:y + shift_2, :] += d_input_cr  # dX
+                d_input[:, x:x + self.filter_size, y:y + self.filter_size, :] += d_input_cr  # dX
 
-                Xc = self.X[:, x - shift_1:x + shift_2, y - shift_1:y + shift_2, :]  # X crop
+                Xc = self.X[:, x:x + self.filter_size, y:y + self.filter_size, :]  # X crop
                 Xcr = Xc.reshape([batch_size, self.filter_size ** 2 * self.in_channels])  # X crop reshaped
                 Xcrt = np.transpose(Xcr)  # X cropped reshaped transposed
                 dW = np.dot(Xcrt, d_out[:, x, y, :])  # dW for one sample of d_input
@@ -180,10 +182,15 @@ class ConvolutionalLayer:
                 self.W.grad += dWr / batch_size  # accumulate dW.
                 # !Деление на BatchSize - эмпирическое решение, нет гарантий, что оно верно!
                 d_out_r = d_out.reshape([batch_size * out_height * out_width, out_channels])
-                self.B.grad += d_out.sum(axis=0).reshape(self.B.value.shape) / batch_size
+                self.B.grad += d_out_r.sum(axis=0).reshape(self.B.value.shape) / batch_size
                 # !Деление на BatchSize - эмпирическое решение, нет гарантий, что оно верно!
+        # print(d_input[0, :, :, 0])
 
-        return d_input
+        p = self.padding
+        if self.padding == 0:
+            return d_input
+        else:
+            return d_input[:, self.padding:-self.padding, self.padding:-self.padding, :]
 
     def params(self):
         return {'W': self.W, 'B': self.B}

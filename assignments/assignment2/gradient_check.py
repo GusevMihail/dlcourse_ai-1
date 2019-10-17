@@ -123,10 +123,10 @@ def check_gradient_batch(f, x, delta=1e-5, tol=1e-4):
     it.close()
 
     # DEBUG
-    # print('  analytic_grad\n', analytic_grad, '\n')
-    # print('  numeric_grad\n', numeric_grad, '\n')
-    print('analytic_grad\n', analytic_grad, 'sum = ', np.sum(analytic_grad), '\n')
-    print('numeric_grad\n', numeric_grad, 'sum = ', np.sum(numeric_grad), '\n')
+    print('  analytic_grad\n', analytic_grad, '\n')
+    print('  numeric_grad\n', numeric_grad, '\n')
+    # print('analytic_grad\n', analytic_grad, 'sum = ', np.sum(analytic_grad), '\n')
+    # print('numeric_grad\n', numeric_grad, 'sum = ', np.sum(numeric_grad), '\n')
 
     if np.all(np.isclose(numeric_grad, analytic_grad)):
         print("Gradient check passed!\n")
