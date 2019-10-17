@@ -186,11 +186,11 @@ class ConvolutionalLayer:
                 # !Деление на BatchSize - эмпирическое решение, нет гарантий, что оно верно!
         # print(d_input[0, :, :, 0])
 
-        p = self.padding
         if self.padding == 0:
             return d_input
         else:
-            return d_input[:, self.padding:-self.padding, self.padding:-self.padding, :]
+            p = self.padding
+            return d_input[:, p:-p, p:-p, :]
 
     def params(self):
         return {'W': self.W, 'B': self.B}
