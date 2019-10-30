@@ -182,7 +182,7 @@ class ConvolutionalLayer:
                 self.W.grad += dWr / batch_size  # accumulate dW.
                 # !Деление на BatchSize - эмпирическое решение, нет гарантий, что оно верно!
                 d_out_r = d_out.reshape([batch_size * out_height * out_width, out_channels])
-                self.B.grad += d_out_r.sum(axis=0).reshape(self.B.value.shape) / batch_size
+                self.B.grad += d_out_r.sum(axis=1).reshape(self.B.value.shape) / batch_size
                 # !Деление на BatchSize - эмпирическое решение, нет гарантий, что оно верно!
         # print(d_input[0, :, :, 0])
 
@@ -223,14 +223,27 @@ class MaxPoolingLayer:
             for x in range(out_width):
                 ps = self.pool_size
                 st = self.stride
-                Xc = self.X[x * st: x * st + ps, y * st: y * st + ps]  # X cropped
+                Xc = self.X[:, x * st: x * st + ps, y * st: y * st + ps, :]  # X cropped
                 out[:, x, y, :] = np.amax(np.amax(Xc, axis=1), axis=1)
         return out
 
     def backward(self, d_out):
         # TODO: Implement maxpool backward pass
         batch_size, height, width, channels = self.X.shape
-        raise Exception("Not implemented!")
+        _, out_height, out_width, _ = d_out.shape
+        dX = np.zeros_like(self.X)
+        for y in range(out_height):
+            for x in range(out_width):
+                for b in range(batch_size):
+                    for c in range(channels):
+                        ps = self.pool_size
+                        st = self.stride
+                        Xc = self.X[b, x * st: x * st + ps, y * st: y * st + ps, c]  # X cropped
+                        # ind_max = np.where(Xc == Xc.max())
+                        ind_max = np.unravel_index(np.argmax(Xc), Xc.shape)
+                        # dX[b, x * st + ind_max[0][0], y * st + ind_max[1][0], c] = d_out[b, x, y, c]
+                        dX[b, x * st + ind_max[0], y * st + ind_max[1], c] = d_out[b, x, y, c]
+        return dX
 
     def params(self):
         return {}
@@ -239,18 +252,22 @@ class MaxPoolingLayer:
 class Flattener:
     def __init__(self):
         self.X_shape = None
+        self.batch_size = None
+        self.height = None
+        self.width = None
+        self.channels = None
 
     def forward(self, X):
-        batch_size, height, width, channels = X.shape
+        self.batch_size, self.height, self.width, self.channels = X.shape
 
         # TODO: Implement forward pass
         # Layer should return array with dimensions
         # [batch_size, height*width*channels]
-        raise Exception("Not implemented!")
+        return X.reshape([self.batch_size, self.height * self.width * self.channels])
 
     def backward(self, d_out):
         # TODO: Implement backward pass
-        raise Exception("Not implemented!")
+        return d_out.reshape([self.batch_size, self.height, self.width, self.channels])
 
     def params(self):
         # No params!

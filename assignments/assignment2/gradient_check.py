@@ -124,7 +124,7 @@ def check_gradient_batch(f, x, delta=1e-5, tol=1e-4):
 
     # DEBUG
 
-    if np.all(np.isclose(numeric_grad, analytic_grad)):
+    if np.all(np.isclose(numeric_grad, analytic_grad, tol)):
         print("Gradient check passed!\n")
         return True
     else:
