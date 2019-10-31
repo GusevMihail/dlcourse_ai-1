@@ -118,8 +118,10 @@ class Trainer:
             val_accuracy = self.compute_accuracy(self.dataset.val_X,
                                                  self.dataset.val_y)
 
-            print("Loss: %f, Train accuracy: %f, val accuracy: %f" %
-                  (batch_losses[-1], train_accuracy, val_accuracy))
+            print(f"#{epoch+1:3} lr:{self.learning_rate:.2e} Loss:{batch_losses[-1]:.3f}, "
+                  f"Train accuracy:{train_accuracy:.3f}, val accuracy:{val_accuracy:.3f}")
+            # print("Loss: %f, Train accuracy: %f, val accuracy: %f" %
+            #       (batch_losses[-1], train_accuracy, val_accuracy))
 
             loss_history.append(ave_loss)
             train_acc_history.append(train_accuracy)

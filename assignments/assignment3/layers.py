@@ -182,7 +182,8 @@ class ConvolutionalLayer:
                 self.W.grad += dWr / batch_size  # accumulate dW.
                 # !Деление на BatchSize - эмпирическое решение, нет гарантий, что оно верно!
                 d_out_r = d_out.reshape([batch_size * out_height * out_width, out_channels])
-                self.B.grad += d_out_r.sum(axis=1).reshape(self.B.value.shape) / batch_size
+                self.B.grad += d_out_r.mean(axis=0).reshape(self.B.value.shape)
+                # self.B.grad += d_out_r.sum(axis=0).reshape(self.B.value.shape) / batch_size
                 # !Деление на BatchSize - эмпирическое решение, нет гарантий, что оно верно!
         # print(d_input[0, :, :, 0])
 
