@@ -1,2 +1,6 @@
 .DS_Store
 /.idea/
+*/.ipynb_checkpoints
+/assignments/assignment2/.ipynb_checkpoints
+/assignments/assignment2/data
+
