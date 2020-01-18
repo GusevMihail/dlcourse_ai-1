@@ -25,12 +25,17 @@ def check_gradient(f, x, delta=1e-5, tol=1e-4):
 
     assert analytic_grad.shape == x.shape
 
-    if len(x.shape) == 1:  # input is single sample
-        print('run single-point version of gradient check')
-        return check_gradient_single(f, x, delta, tol)
-    else:
-        print('run batch version of gradient check')
-        return check_gradient_batch(f, x, delta, tol)
+    # auto-pick single- or batch-version
+    # if len(x.shape) == 1:  # input is single sample
+    #     print('run single-point version of gradient check')
+    #     return check_gradient_single(f, x, delta, tol)
+    # else:
+    #     print('run batch version of gradient check')
+    #     return check_gradient_batch(f, x, delta, tol)
+
+    # run batch version in all cases
+    print('run batch version of gradient check')
+    return check_gradient_batch(f, x, delta, tol)
 
 
 def check_gradient_single(f, x, delta=1e-5, tol=1e-4):
@@ -118,16 +123,16 @@ def check_gradient_batch(f, x, delta=1e-5, tol=1e-4):
     it.close()
 
     # DEBUG
-    print('  analytic_grad\n', analytic_grad, '\n')
-    print('  numeric_grad\n', numeric_grad, '\n')
-    # print('analytic_grad\n', analytic_grad, 'sum = ', np.sum(analytic_grad), '\n')
-    # print('numeric_grad\n', numeric_grad, 'sum = ', np.sum(numeric_grad), '\n')
 
-    if np.all(np.isclose(numeric_grad, analytic_grad)):
+    if np.all(np.isclose(numeric_grad, analytic_grad, tol)):
         print("Gradient check passed!\n")
         return True
     else:
         print("Gradients are different!\n")
+        print('  analytic_grad\n', analytic_grad, '\n')
+        print('  numeric_grad\n', numeric_grad, '\n')
+        # print('analytic_grad\n', analytic_grad, 'sum = ', np.sum(analytic_grad), '\n')
+        # print('numeric_grad\n', numeric_grad, 'sum = ', np.sum(numeric_grad), '\n')
         return False
 
 
